@@ -1,1 +1,43 @@
+import numpy as np
+import matplotlib.pyplot as plt
 
+T=np.array([31.43,21.16,14.23,11.50])
+T_err=np.array([0.5]*4)
+U=np.array([5,7,10,12])
+U_err=np.array([0.1]*4)
+
+fig, ax = plt.subplots(figsize = (16,9)) #
+ax.errorbar(0.1*T, U, xerr=0.1*T_err, yerr=U_err,marker=".",linestyle="none")
+minor_ticks_top=np.linspace(0,30,31)
+ax.set_xticks(minor_ticks_top,minor=True)
+ax.set_yticks(minor_ticks_top,minor=True)
+ax.plot(0.1*T, U)
+ax.grid()
+ax.grid(which='minor')
+ax.set_xlabel('Zeit t [s]')
+ax.set_ylabel('Spannung U [mV]')#Achsen beschriften
+#ax.legend()#legende einfügen
+ax.tick_params(axis='x', labelrotation=30)# Skalen der x achse rotieren
+plt.savefig('a.jpg', dpi = 500)
+
+from kafe2 import XYContainer, Fit, Plot
+
+
+def linearf(x, m, b):# Our first model is a simple linear function
+     return m * x + b
+def linfit(x_data, y_data, x_err, y_err): # funktion mit den datn als argumenten erstellen
+    xy_data = XYContainer(x_data=0.1*T,# behälter für x und y erstellen
+                      y_data=U)
+    xy_data.add_error(axis='x', err_val=0.1*T_err)# felher hinzufügen
+    xy_data.add_error(axis='y', err_val=U_err)
+    xy_data.axis_labels = ( 'Time','Voltage')
+    lin_fit = Fit(data=xy_data, model_function=linearf)# Objekt mit dem xy- Behälter und der linearen Funkrion erzeugen
+    fit_results = lin_fit.do_fit() # ergebnisse bestimmen und später ausgeben lassen
+    #linear_fit.report()
+    plot = Plot(fit_objects=lin_fit) 
+    plot.plot()
+    plt.savefig('b.jpg', dpi = 300)
+    plt.show()
+    return fit_results
+
+print(linfit(T, U, T_err, U_err)['parameter_cov_mat'])# Ergebnisse in der Kovarianzmatrix ausgeben lassen
