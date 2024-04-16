@@ -1,0 +1,68 @@
+import matplotlib.pyplot as plt
+import scipy.optimize as opt
+from scipy.odr import ODR, Model, RealData
+import numpy as np
+import csv
+import os
+import pandas as pd
+
+
+# Hier wird der Input im CSV-Format eingelesen.
+# Als Argument bekomment die Funktion den Pfad zur Datei.
+# Achtung: es wird erwartet, dass die erste Zeile Ueberschriften
+# enthaelt!
+def read_csv_input(filename):
+    # Datei wird lesend geoeffnet.
+    with open(filename, "r") as file:
+        # Ein "Reader" wird aufgesetzt, der die Datei liest.
+        # Ausserdem wird das Trennungszeichen zwischen den Spalten
+        # definiert.
+        dictR = csv.DictReader(file, delimiter=",")
+        # Es wurden keine fieldnames beim Aufruf von DictReader definiert,
+        # deswegen werden als Default die Werte aus der ersten Zeile als
+        # fieldnames aka Header genommen.
+        # Diese Zeile erstellt ein Python-Dictionary, welches als Keys
+        # die Ueberschriften enthaelt und ansonsten leer ist.
+        data = {hdr: [] for hdr in dictR.fieldnames}
+        # Loope durch jede Zeile
+        for row in dictR:
+            # Loope durch jede Spalte in jeder Zeile
+            for field in row:
+                # Fuege den aktuellen Wert der aktuellen Spalte hinzu.
+                # Falls der Wert keine Zahl ist (z.B. eine leere Zelle),
+                # soll er als Null interpretiert werden.
+                try:
+                    data[field].append(float(row[field]))
+                except ValueError:
+                    data[field].append(0.)
+    # Das fertige Python-Dictionary wird zurueckgegeben
+    return data
+
+
+# Definition einer linearen Funktion, welche gefittet werden soll
+def linear_func(x, m, b):
+    return m * x + b
+
+# Als Argument bekommt die Funktion das Werte-Dictionary von
+# der Funktion read_csv_input()
+def auswertung_102d(data):
+    # Hier könnte Ihre Auswertung stehen!
+    # Ein kurzes Tutorial dazu wie man Daten graphisch darstellen kann, finden Sie unter:
+    # https://matplotlib.org/stable/tutorials/pyplot.html
+    # Einige Beispiele zum Fitten von Funktionen finden Sie etwa unter:
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html
+
+    # Gebe die Fitparameter zurueck, um sie in der naechsten Aufgabe weiter-
+    # verwenden zu koennen.
+    print(optimizedParameters, np.sqrt(np.diag(pcov)))
+    return optimizedParameters
+
+if __name__ == '__main__':
+    input_dir = "../Daten_Versuch_102"
+    params = None
+    
+    data = read_csv_input(os.path.join(input_dir, f))
+    data_tex = pd.DataFrame.from_dict(data)
+    data_tex = data_tex.to_latex(index=False)
+    print(data_tex)
+    params = auswertung_102d(data)
