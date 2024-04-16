@@ -7,6 +7,7 @@ import os
 import pandas as pd
 
 
+# auch alternative zeigen wie man direkt aus ods/xlsx liest
 # Hier wird der Input im CSV-Format eingelesen.
 # Als Argument bekomment die Funktion den Pfad zur Datei.
 # Achtung: es wird erwartet, dass die erste Zeile Ueberschriften
@@ -43,26 +44,77 @@ def read_csv_input(filename):
 def linear_func(x, m, b):
     return m * x + b
 
+
+# Diese Variante ist ein einfacher chi2-Fit,
+# beruecksichtigt daher aber keine Fehler in x-Richtung.
 # Als Argument bekommt die Funktion das Werte-Dictionary von
 # der Funktion read_csv_input()
 def auswertung_102d(data):
-    # Hier könnte Ihre Auswertung stehen!
-    # Ein kurzes Tutorial dazu wie man Daten graphisch darstellen kann, finden Sie unter:
-    # https://matplotlib.org/stable/tutorials/pyplot.html
-    # Einige Beispiele zum Fitten von Funktionen finden Sie etwa unter:
-    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html
-
+        
+    # Fuer das spaetere Plotten muessen wir die einfachen Listen zu
+    # numpy-Arrays konvertieren.
+    xdata = np.asarray(data['entries'])
+    ydata = np.asarray(data['x axis'])
+    #xerr = np.asarray(data['Delta U'])
+    #yerr = np.asarray(freq_err)
+    # Erstelle einen Plot mit Fehlerbalken
+    #plt.errorbar(xdata, ydata, marker='o',
+                # linestyle='none', label="Data")
+    # Fitte die lineare Funktion, die in linear_func() definiert wurde.
+    # Da wir absolute Zahlen als Unsicherheiten auf die Frequenzen ausgerechnet
+    # haben, muessen wir absolute_sigma=True setzen. Ansonsten wuerden
+    # die Unsicherheiten als relative Fehler angenommen werden.
+    optimizedParameters, pcov = opt.curve_fit(linear_func, xdata, ydata)
+    # Plotte das Ergebnis des Fits in den selben Canvas.
+    plt.plot(xdata, linear_func(xdata, *optimizedParameters), label="Fit")
+    # Hier werden ein paar kosmetische Feinheiten eingestellt.
+    # Damit wir Platz fuer eine Box mit den Fitergebnissen haben, vergroessern
+    # wir den Canvas nach oben um 20%. Dafuer merken wir uns zunaechst die
+    # urspruenglichen Werte.
+    bottom, top = plt.ylim()
+    plt.ylim(bottom, top*1.2)
+    # Erstelle eine Textbox mit den Fitergebnissen. Man kann dabei auch
+    # LaTeX-Formatierungen verwenden fuer eine bessere Gestaltung.
+    plt.text(0.05, 0.95, r'Frequenz $\nu = m\cdot x + b$'
+             '\n'
+             r'$m=(%.3f \pm %.3f) \ \frac{\mathrm{Hz}}{\mathrm{V}}$'
+             '\n'
+             r'$b=(%.2f \pm %.2f) \ \mathrm{Hz}$'
+             % (optimizedParameters[0], np.sqrt(np.diag(pcov))[0],
+                optimizedParameters[1], np.sqrt(np.diag(pcov))[1]),
+             # Referenzpunkt vom Textblock, der zum Positionieren benutzt wird
+             ha='left', va='top',
+             # Nutze relative Koordinaten fuer die Position statt absolute
+             transform=plt.gca().transAxes)
+    # Hier werden Achsenlabel festgelegt
+    plt.xlabel('entries')
+    plt.ylabel('x axis')
+    # Erstelle eine Legende. Dafuer werden die label-Werte benutzt.
+    plt.legend()
+    # Speichere den Plot. Zum Qualitaetsvergleich wird er einmal als PDF
+    # und einmal als PNG gespeichert.
+    plt.savefig('102d.pdf', bbox_inches='tight')
+    plt.savefig('102d.png', bbox_inches='tight')
+    # Der Inhalt des Plotobjekts wird leergeraeumt. Beim naechsten
+    # Aufruf von plt wird ansonsten in der gleichen Umgebung geplottet.
+    # Dies laesst sich auch anders umgehen, dies ist lediglich die
+    # einfachste Variante.
+    plt.clf()
     # Gebe die Fitparameter zurueck, um sie in der naechsten Aufgabe weiter-
     # verwenden zu koennen.
     print(optimizedParameters, np.sqrt(np.diag(pcov)))
     return optimizedParameters
 
+
+
 if __name__ == '__main__':
-    input_dir = "../Daten_Versuch_102"
+    input_dir = ""
     params = None
-    
+    f = "multi_gaus.csv"
+
     data = read_csv_input(os.path.join(input_dir, f))
     data_tex = pd.DataFrame.from_dict(data)
     data_tex = data_tex.to_latex(index=False)
     print(data_tex)
     params = auswertung_102d(data)
+    
