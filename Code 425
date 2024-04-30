@@ -41,3 +41,25 @@ def linfit(x_data, y_data, x_err, y_err): # funktion mit den datn als argumenten
     return fit_results
 
 print(linfit(T, U, T_err, U_err)['parameter_cov_mat'])# Ergebnisse in der Kovarianzmatrix ausgeben lassen
+
+
+#Johnson Rauschen Abhängigkeit vom Widerstand
+
+import pandas as pd
+
+# Define the corrected data
+data = {
+    'R [Ohm]': [1, 10, 100, 1000, 10000, 100000, 1000000],
+    'U_meter [V]': [0.979, 0.982, 1.006, 0.697, 0.905, 0.826, 0.875],
+    'G2': [2000, 2000, 2000, 1500, 1000, 400, 300]
+}
+
+# Create a DataFrame
+df = pd.DataFrame(data)
+
+# Calculate V_rauschen^2
+df['V_rauschen^2 [V^2]'] = 10 * df['U_meter [V]'] / (600 * df['G2'])**2
+
+# Display the DataFrame with the recalculated column
+df
+
