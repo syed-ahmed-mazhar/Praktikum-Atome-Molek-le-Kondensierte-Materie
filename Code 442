@@ -1,0 +1,55 @@
+#Plot für die drei Resonatorlängen
+
+# Load the new CSV file, skipping the first 18 rows
+file_path_new = '~/P4/442/F0000CH2.CSV'
+data_new = pd.read_csv(file_path_new, skiprows=18, header=None)
+
+# Extract the time and voltage columns
+time_new = data_new[3] * 1000
+voltage_new = data_new[4]
+
+# Plot the data
+plt.figure(figsize=(10, 6))
+plt.plot(time_new, voltage_new, label='Voltage over Time')
+plt.xlabel('Zeit (ms)')
+plt.ylabel('Spannung (V)')
+plt.title('Zeit gegen Spannung(Resonatorlänge = )')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Load the new CSV file, skipping the first 18 rows
+file_path_new = '~/P4/442/F0001CH2.CSV'
+data_new = pd.read_csv(file_path_new, skiprows=18, header=None)
+
+# Extract the time and voltage columns
+time_new = data_new[3] * 1000
+voltage_new = data_new[4]
+
+# Plot the data
+plt.figure(figsize=(10, 6))
+plt.plot(time_new, voltage_new, label='Voltage over Time')
+plt.xlabel('Zeit (ms)')
+plt.ylabel('Spannung (V)')
+plt.title('Zeit gegen Spannung(Resonatorlänge = )')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Load the new CSV file, skipping the first 18 rows
+file_path_new = '~/P4/442/F0003CH2.CSV'
+data_new = pd.read_csv(file_path_new, skiprows=18, header=None)
+
+# Extract the time and voltage columns
+time_new = data_new[3] * 1000
+voltage_new = data_new[4]
+
+# Plot the data
+plt.figure(figsize=(10, 6))
+plt.plot(time_new, voltage_new, label='Voltage over Time')
+plt.xlabel('Zeit (ms)')
+plt.ylabel('Spannung (V)')
+plt.title('Zeit gegen Spannung(Resonatorlänge = )')
+plt.legend()
+plt.grid(True)
+plt.show()
